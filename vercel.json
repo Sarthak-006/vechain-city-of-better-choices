@@ -1,6 +1,5 @@
 {
     "version": 2,
-    "name": "city-of-better-choices",
     "builds": [
         {
             "src": "api/index.py",
@@ -10,7 +9,7 @@
             }
         },
         {
-            "src": "public/**",
+            "src": "public/*",
             "use": "@vercel/static"
         }
     ],
