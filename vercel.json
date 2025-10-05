@@ -5,7 +5,7 @@
             "src": "api/index.py",
             "use": "@vercel/python",
             "config": {
-                "maxLambdaDuration": 1800
+                "maxLambdaDuration": 900
             }
         },
         {
@@ -25,7 +25,7 @@
     ],
     "functions": {
         "api/index.py": {
-            "maxDuration": 1800
+            "maxDuration": 900
         }
     }
 }
