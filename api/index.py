@@ -230,33 +230,6 @@ def get_node_details(node_id):
         return None
 
 # --- API Endpoints ---
-@app.route('/')
-def serve_index():
-    try:
-        return send_from_directory('../public', 'index.html')
-    except Exception as e:
-        print(f"Error serving index: {str(e)}")
-        # Fallback response
-        return """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>City of Better Choices</title>
-        </head>
-        <body>
-            <h1>City of Better Choices</h1>
-            <p>Loading game...</p>
-            <script>
-                // Redirect to API test
-                fetch('/api/test')
-                    .then(response => response.json())
-                    .then(data => console.log('API Status:', data))
-                    .catch(error => console.error('API Error:', error));
-            </script>
-        </body>
-        </html>
-        """, 200
-
 @app.route('/health')
 def health_check():
     return jsonify({"status": "healthy", "message": "City of Better Choices API is running"})
@@ -265,13 +238,13 @@ def health_check():
 def test_endpoint():
     return jsonify({"message": "API is working", "timestamp": time.time()})
 
-@app.route('/<path:path>')
-def serve_static(path):
-    try:
-        return send_from_directory('../public', path)
-    except Exception as e:
-        print(f"Error serving static file {path}: {str(e)}")
-        return f"Error serving file: {str(e)}", 404
+@app.route('/api/health')
+def api_health():
+    return jsonify({
+        "status": "healthy",
+        "timestamp": time.time(),
+        "version": "1.0.0"
+    })
 
 @app.route('/api/state', methods=['GET'])
 def get_current_state():
@@ -293,23 +266,13 @@ def get_current_state():
         node_details = get_node_details(current_node_id)
         
         if not node_details:
-            # Migrate legacy nodes from older theme by resetting to start
-            legacy_nodes = {
-                "generic_good_ending", "generic_neutral_ending", "generic_bad_ending",
-                "heroic_savior_ending", "wise_mage_ending", "forest_guardian_ending",
-                "peaceful_traveler_ending", "forest_explorer_ending", "merchant_ending",
-                "lost_soul_ending", "cursed_wanderer_ending", "forest_prisoner_ending",
-                "deep_forest", "grateful_creature", "hidden_treasure", "amulet_power",
-                "forest_edge", "lost_forest", "lost_deeper", "tree_climb", "creature_guidance",
-                "stone_circle", "wise_decision", "village_arrival", "cave_entrance"
-            }
-            if current_node_id in legacy_nodes:
-                # reset to new start
-                game_state = reset_game_state(session_id)
-                current_node_id = game_state["current_node_id"]
-                node_details = get_node_details(current_node_id)
-            else:
-                return jsonify({"error": "Invalid node"}), 400
+            # Reset to start if node is invalid
+            game_state = reset_game_state(session_id)
+            current_node_id = game_state["current_node_id"]
+            node_details = get_node_details(current_node_id)
+            
+            if not node_details:
+                return jsonify({"error": "Failed to initialize game"}), 500
         
         # Generate image URL with dynamic seed and enhanced prompt
         path_node_ids = game_state.get("path_history", [])
@@ -448,7 +411,12 @@ def get_current_state():
     except Exception as e:
         print(f"Error in get_current_state: {str(e)}")
         traceback.print_exc()
-        return jsonify({"error": f"Server error: {str(e)}"}), 500
+        # Return a more user-friendly error message
+        return jsonify({
+            "error": "Game initialization failed", 
+            "details": str(e),
+            "timestamp": time.time()
+        }), 500
 
 @app.route('/api/choice', methods=['POST'])
 def make_choice():
