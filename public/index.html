@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Make sustainable choices in the City of Better Choices where your decisions impact the environment and community. Save your story to blockchain and own your impact forever.">
+    <title>City of Better Choices | Interactive Blockchain Adventure</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+</head>
+
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">City of <span>Better Choices</span></h1>
+            <div class="header-right">
+                <div id="score-display" class="score">Score: 0</div>
+                <div id="blockchain-status" class="blockchain-status">
+                    <span id="connection-status">🔴 Not Connected</span>
+                    <button id="connect-sync2" class="connect-button" style="display: none;">Connect Sync2</button>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <div class="image-container">
+                <img id="story-image" alt="Story scene" class="story-image">
+                <div class="image-overlay"></div>
+            </div>
+
+            <div id="situation-text" class="situation"></div>
+
+            <div id="loading-indicator" class="loading">Loading...</div>
+
+            <div id="choices" class="choice-container"></div>
+        </main>
+
+        <div id="end-screen" class="end-screen" style="display: none;">
+            <div id="end-text" class="end-text"></div>
+            <div class="end-images">
+                <img id="manga-image" alt="Story manga" class="manga-image">
+                <img id="summary-image" alt="Story summary" class="summary-image">
+            </div>
+        </div>
+
+        <!-- Add modal dialog for sharing -->
+        <div id="share-modal" class="share-modal" style="display: none;">
+            <div class="share-modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Your City of Better Choices</h2>
+                <div class="share-image-container">
+                    <img id="share-manga-image" alt="Shareable City of Better Choices story" class="share-manga-image">
+                    <div id="share-loading" class="loading">Generating your story...</div>
+                </div>
+                <div class="share-actions">
+                    <button id="download-image" class="action-button download-button">Download Image</button>
+                    <button id="copy-image" class="action-button copy-button">Copy Image</button>
+                    <button id="share-twitter" class="action-button social-button twitter-button">Share on
+                        Twitter</button>
+                    <button id="share-facebook" class="action-button social-button facebook-button">Share on
+                        Facebook</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="game-footer">
+            <p>
+                <span class="footer-brand">City of Better Choices</span> &copy; <span id="current-year"></span> |
+                Images by <a href="https://pollinations.ai" target="_blank" rel="noopener">pollinations.ai</a>
+            </p>
+            <p class="footer-note">
+                Your choices shape your destiny. Choose wisely.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Expose a helper to open Sync2 if available via deep link
+        window.openSync2 = function () {
+            try {
+                // Try multiple approaches to open Sync2
+                const sync2Urls = [
+                    'https://sync.vecha.in/',
+                    'https://faucet.vecha.in/',
+                    'vechain://sync2',
+                    'sync://open'
+                ];
+
+                // Try the first URL that works
+                for (const url of sync2Urls) {
+                    try {
+                        if (url.startsWith('http')) {
+                            window.open(url, '_blank', 'noopener');
+                            break;
+                        } else {
+                            window.location.href = url;
+                            break;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+            } catch (e) {
+                console.warn('Unable to open Sync2 helper:', e);
+                // Final fallback
+                window.open('https://sync.vecha.in/', '_blank', 'noopener');
+            }
+        }
+    </script>
+    <!-- Connex (VeChain) browser SDK for Sync2 integration -->
+    <script src="https://unpkg.com/@vechain/connex@2"></script>
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
